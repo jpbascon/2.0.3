@@ -55,37 +55,6 @@ function appendItem(item, index) {
   }
 }
 
-addToCartBtn.forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    addStyles(idx);
-
-    const quantity = deincrementQty[idx];
-    let value = parseInt(quantity.textContent, 10);
-    quantity.textContent = value + 1
-  })
-})
-
-
-incrementBtn.forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    const quantity = deincrementQty[idx];
-    let value = parseInt(quantity.textContent, 10);
-    quantity.textContent = value + 1;
-  })
-})
-
-decrementBtn.forEach((btn, idx) => {
-  btn.addEventListener('click', () => {
-    const quantity = deincrementQty[idx];
-    let value = parseInt(quantity.textContent, 10);
-    quantity.textContent = value - 1;
-
-    if (value === 1) {
-      removeStyles(idx);
-    }
-  })
-})
-
 function removeStyles(idx) {
   addToCartBtn[idx].style.display = 'flex';
   deincrementBtn[idx].style.display = 'none';
@@ -97,3 +66,34 @@ function addStyles(idx) {
   deincrementBtn[idx].style.display = 'flex';
   insertedImages[idx].classList.add('active');
 }
+
+function updateQuantity(idx, delta) {
+  const quantity = deincrementQty[idx];
+  let value = parseInt(quantity.textContent, 10) || 0;
+  const newValue = value + delta;
+
+  quantity.textContent = newValue;
+  if (newValue <= 0) {
+    removeStyles(idx);
+  }
+}
+
+addToCartBtn.forEach((btn, idx) => {
+  btn.addEventListener('click', () => {
+    addStyles(idx);
+    updateQuantity(idx, 1);
+  })
+})
+
+
+incrementBtn.forEach((btn, idx) => {
+  btn.addEventListener('click', () => {
+    updateQuantity(idx, 1);
+  })
+})
+
+decrementBtn.forEach((btn, idx) => {
+  btn.addEventListener('click', () => {
+    updateQuantity(idx, -1);
+  })
+})
