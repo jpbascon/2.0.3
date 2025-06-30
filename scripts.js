@@ -3,6 +3,8 @@ const deincrementBtn = document.querySelectorAll('.deincrement');
 const decrementBtn = document.querySelectorAll('.decrement');
 const incrementBtn = document.querySelectorAll('.increment');
 const deincrementQty = document.querySelectorAll('.deincrement-quantity');
+const cartQty = document.getElementById('cart-quantity');
+const product = document.getElementById('products');
 const insertImg = document.querySelectorAll('.img-placeholder');
 const insertDescription = document.querySelectorAll('.description');
 
@@ -31,10 +33,12 @@ function populateDOM(data) {
 }
 
 let insertedImages = [];
+let getProduct = [];
 
 function appendItem(item, index) {
   const { thumbnail, mobile, tablet, desktop } = item.image;
   const { name, category, price } = item;
+  getProduct = item;
 
   const imgElement = document.createElement('img');
   const categoryElement = document.createElement('p');
@@ -78,10 +82,28 @@ function updateQuantity(idx, delta) {
   }
 }
 
+function updateCart(idx, delta) {
+  const quantity = cartQty;
+  const { name, price } = getProduct;
+  const nameProduct = document.createElement('p');
+  const priceProduct = document.createElement('p');
+  let value = parseInt(quantity.textContent, 10) || 0;
+
+  const newValue = value + delta;
+  cartQty.textContent = newValue;
+
+  nameProduct.textContent = name;
+  priceProduct.textContent = price;
+
+  product[idx].replaceChildren(nameProduct, priceProduct);
+}
+
+
 addToCartBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     addStyles(idx);
     updateQuantity(idx, 1);
+    updateCart(idx, 1);
   })
 })
 
@@ -89,11 +111,13 @@ addToCartBtn.forEach((btn, idx) => {
 incrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, 1);
+    updateCart(idx, 1);
   })
 })
 
 decrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, -1);
+    updateCart(idx, -1);
   })
 })
