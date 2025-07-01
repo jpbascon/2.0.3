@@ -5,6 +5,8 @@ const incrementBtn = document.querySelectorAll('.increment');
 const deincrementQty = document.querySelectorAll('.deincrement-quantity');
 const cartQty = document.getElementById('cart-quantity');
 const product = document.getElementById('products');
+const productQty = document.getElementById('second-row');
+const emptyCart = document.getElementById('empty-cart');
 const insertImg = document.querySelectorAll('.img-placeholder');
 const insertDescription = document.querySelectorAll('.description');
 
@@ -38,7 +40,7 @@ let getProduct = [];
 function appendItem(item, index) {
   const { thumbnail, mobile, tablet, desktop } = item.image;
   const { name, category, price } = item;
-  getProduct = item;
+  getProduct[index] = item;
 
   const imgElement = document.createElement('img');
   const categoryElement = document.createElement('p');
@@ -71,31 +73,48 @@ function addStyles(idx) {
   insertedImages[idx].classList.add('active');
 }
 
+let getQuantity;
+
 function updateQuantity(idx, delta) {
   const quantity = deincrementQty[idx];
   let value = parseInt(quantity.textContent, 10) || 0;
   const newValue = value + delta;
 
   quantity.textContent = newValue;
+  getQuantity = newValue;
+
   if (newValue <= 0) {
     removeStyles(idx);
   }
 }
 
-function updateCart(idx, delta) {
+function updateCartQty(delta) {
   const quantity = cartQty;
-  const { name, price } = getProduct;
-  const nameProduct = document.createElement('p');
-  const priceProduct = document.createElement('p');
   let value = parseInt(quantity.textContent, 10) || 0;
-
   const newValue = value + delta;
   cartQty.textContent = newValue;
 
-  nameProduct.textContent = name;
-  priceProduct.textContent = price;
+  if (newValue === 0) {
+    emptyCart.style.display = 'flex';
+  } else {
+    emptyCart.style.display = 'none';
+  }
+}
 
-  product[idx].replaceChildren(nameProduct, priceProduct);
+function updateCartProduct(index) {
+  let getData = getProduct[index];
+  const { name, price } = getData;
+  const productName = document.createElement('p');
+  const productPrice = document.createElement('p');
+  const productQuantity = document.createElement('p');
+
+  productName.textContent = name;
+  productPrice.textContent = `$${(price.toFixed(2))}`;
+  productQuantity.textContent = getQuantity;
+
+  product.append(productName, productPrice);
+  productQty.replaceChildren(productQuantity);
+  console.log(getQuantity);
 }
 
 
@@ -103,7 +122,8 @@ addToCartBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     addStyles(idx);
     updateQuantity(idx, 1);
-    updateCart(idx, 1);
+    updateCartQty(1);
+    updateCartProduct(idx);
   })
 })
 
@@ -111,13 +131,13 @@ addToCartBtn.forEach((btn, idx) => {
 incrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, 1);
-    updateCart(idx, 1);
+    updateCartQty(1);
   })
 })
 
 decrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, -1);
-    updateCart(idx, -1);
+    updateCartQty(-1);
   })
 })
