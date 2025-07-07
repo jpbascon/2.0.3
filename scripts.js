@@ -101,22 +101,50 @@ function updateCartQty(delta) {
   }
 }
 
-function updateCartProduct(index) {
-  let getData = getProduct[index];
-  const { name, price } = getData;
-  const productName = document.createElement('p');
-  const productPrice = document.createElement('p');
-  const productQuantity = document.createElement('p');
+let cartItems = {};
 
-  productName.textContent = name;
-  productPrice.textContent = `$${(price.toFixed(2))}`;
-  productQuantity.textContent = getQuantity;
+function updateCartProduct(index, delta) {
+  const { name, price } = getProduct[index];
 
-  product.append(productName, productPrice);
-  productQty.replaceChildren(productQuantity);
-  console.log(getQuantity);
+  if (cartItems[index]) {
+    console.log(delta);
+    cartItems[index].quantity += delta;
+    cartItems[index].elements.quantity.textContent = cartItems[index].quantity;
+  } else {
+    const productRow = document.createElement('div');
+    productRow.classList.add('cart-product');
+
+    const productName = document.createElement('p');
+    const productQuantity = document.createElement('p');
+    const productPrice = document.createElement('p');
+    const productBtn = document.createElement('button')
+
+    productName.textContent = name;
+    productPrice.textContent = `$${price.toFixed(2)}`;
+    productQuantity.textContent = 1;
+
+    productRow.append(productName, productPrice, productQuantity, productBtn);
+    product.append(productRow);
+
+    cartItems[index] = {
+      name,
+      price,
+      quantity: 1,
+      elements: {
+        row: productRow,
+        quantity: productQuantity,
+      },
+    };
+  }
+
+  if (cartItems[index].quantity <= 0) {
+    removeStyles(index);
+    if (cartItems[index]) {
+      cartItems[index].elements.row.remove();
+      delete cartItems[index];
+    }
+  }
 }
-
 
 addToCartBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
@@ -132,6 +160,7 @@ incrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, 1);
     updateCartQty(1);
+    updateCartProduct(idx, 1);
   })
 })
 
@@ -139,5 +168,6 @@ decrementBtn.forEach((btn, idx) => {
   btn.addEventListener('click', () => {
     updateQuantity(idx, -1);
     updateCartQty(-1);
+    updateCartProduct(idx, -1);
   })
 })
