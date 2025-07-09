@@ -90,11 +90,10 @@ function updateQuantity(idx, delta) {
 
 function checker() {
   const prevOrderTotal = product.querySelector('.order-total-container');
+  const carbonChecker = product.querySelector('.carbon-neutral');
   if (prevOrderTotal) {
     prevOrderTotal.remove();
   }
-
-  const carbonChecker = product.querySelector('.carbon-neutral');
   if (carbonChecker) {
     carbonChecker.remove();
   }
@@ -131,6 +130,7 @@ function updateOrderTotal() {
     return;
   }
 
+  // Create and append new order total container
   const carbonNeutral = document.createElement('div');
   const carbonInnerText = document.createElement('p');
   const carbonImg = document.createElement('img');
@@ -139,7 +139,6 @@ function updateOrderTotal() {
   carbonInnerText.innerHTML = `This is a <span>carbon-neutral</span> delivery`;
   carbonNeutral.append(carbonImg, carbonInnerText);
 
-  // Create and append new order total container
   const orderTotalContainer = document.createElement('div');
   const order = document.createElement('p');
   const orderTotal = document.createElement('p');
