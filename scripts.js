@@ -88,17 +88,67 @@ function updateQuantity(idx, delta) {
   }
 }
 
+function checker() {
+  const prevOrderTotal = product.querySelector('.order-total-container');
+  if (prevOrderTotal) {
+    prevOrderTotal.remove();
+  }
+
+  const carbonChecker = product.querySelector('.carbon-neutral');
+  if (carbonChecker) {
+    carbonChecker.remove();
+  }
+}
+
+let newValue;
+
 function updateCartQty(delta) {
   const quantity = cartQty;
   let value = parseInt(quantity.textContent, 10) || 0;
-  const newValue = value + delta;
+  newValue = value + delta;
   cartQty.textContent = newValue;
 
   if (newValue === 0) {
     emptyCart.style.display = 'flex';
+    checker();
   } else {
     emptyCart.style.display = 'none';
   }
+}
+
+function updateOrderTotal() {
+  let total = 0;
+  for (const key in cartItems) {
+    if (cartItems.hasOwnProperty(key)) {
+      total += cartItems[key].quantity * cartItems[key].price;
+    }
+  }
+
+  // Remove any previous order total container
+  checker();
+
+  if (newValue === 0) {
+    return;
+  }
+
+  const carbonNeutral = document.createElement('div');
+  const carbonInnerText = document.createElement('p');
+  const carbonImg = document.createElement('img');
+  carbonNeutral.classList.add('carbon-neutral');
+  carbonImg.src = './assets/images/icon-carbon-neutral.svg';
+  carbonInnerText.innerHTML = `This is a <span>carbon-neutral</span> delivery`;
+  carbonNeutral.append(carbonImg, carbonInnerText);
+
+  // Create and append new order total container
+  const orderTotalContainer = document.createElement('div');
+  const order = document.createElement('p');
+  const orderTotal = document.createElement('p');
+  orderTotalContainer.classList.add('order-total-container');
+  order.textContent = 'Order Total';
+  orderTotal.textContent = `$${total.toFixed(2)}`;
+  orderTotalContainer.append(order, orderTotal);
+
+  product.append(orderTotalContainer, carbonNeutral);
 }
 
 let cartItems = {};
@@ -143,7 +193,6 @@ function updateCartProduct(index, delta) {
     productQuantity.textContent = `${1}x`;
     productPriceMultiplied.textContent = `$${price.toFixed(2)}`;
 
-
     productRow.appendChild(innerDivDiv);
     innerDiv.append(productRow)
 
@@ -170,6 +219,8 @@ function updateCartProduct(index, delta) {
       delete cartItems[index];
     }
   }
+
+  updateOrderTotal();
 }
 
 addToCartBtn.forEach((btn, idx) => {
