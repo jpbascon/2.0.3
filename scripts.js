@@ -76,11 +76,11 @@ function addStyles(idx) {
 let getQuantity;
 
 function updateQuantity(idx, delta) {
-  const quantity = deincrementQty[idx];
-  let value = parseInt(quantity.textContent, 10) || 0;
+  const deincrementQuantity = deincrementQty[idx];
+  let value = parseInt(deincrementQuantity.textContent, 10) || 0;
   const newValue = value + delta;
 
-  quantity.textContent = newValue;
+  deincrementQuantity.textContent = newValue;
   getQuantity = newValue;
 
   if (newValue <= 0) {
@@ -107,31 +107,57 @@ function updateCartProduct(index, delta) {
   const { name, price } = getProduct[index];
 
   if (cartItems[index]) {
-    console.log(delta);
     cartItems[index].quantity += delta;
-    cartItems[index].elements.quantity.textContent = cartItems[index].quantity;
+    cartItems[index].priceMultiplied.textContent = `$${(cartItems[index].quantity * cartItems[index].price).toFixed(2)}`;
+    cartItems[index].elements.quantity.textContent = `${cartItems[index].quantity}x`;
   } else {
     const productRow = document.createElement('div');
-    productRow.classList.add('cart-product');
-
+    const innerDiv = document.createElement('div');
+    const innerDivDiv = document.createElement('div');
     const productName = document.createElement('p');
     const productQuantity = document.createElement('p');
     const productPrice = document.createElement('p');
-    const productBtn = document.createElement('button')
+    const productPriceMultiplied = document.createElement('p');
+    const productBtn = document.createElement('button');
+
+    productBtn.classList.add('remove-product-btn');
+    productRow.classList.add('inner-div')
+    innerDiv.classList.add('inner');
+    innerDivDiv.classList.add('inner-divdiv');
+
+    productBtn.addEventListener('click', () => {
+      const removedQty = cartItems[index].quantity; // ✅ store value before delete
+      cartItems[index].elements.row.remove();       // remove DOM element
+      delete cartItems[index];                      // delete item from cart
+      updateCartQty(-removedQty);                 // update total quantity
+      removeStyles(index);
+      deincrementQty[index].textContent = 0;
+    })
+
+    const btnImg = document.createElement('img');
+    btnImg.src = './assets/images/icon-remove-item.svg';
+    productBtn.appendChild(btnImg);
 
     productName.textContent = name;
-    productPrice.textContent = `$${price.toFixed(2)}`;
-    productQuantity.textContent = 1;
+    productPrice.textContent = `@ $${price.toFixed(2)}`;
+    productQuantity.textContent = `${1}x`;
+    productPriceMultiplied.textContent = `$${price.toFixed(2)}`;
 
-    productRow.append(productName, productPrice, productQuantity, productBtn);
-    product.append(productRow);
+
+    productRow.appendChild(innerDivDiv);
+    innerDiv.append(productRow)
+
+    productRow.append(productName, innerDivDiv);
+    innerDivDiv.append(productQuantity, productPrice, productPriceMultiplied, productBtn);
+    product.append(innerDiv);
 
     cartItems[index] = {
       name,
       price,
       quantity: 1,
+      priceMultiplied: productPriceMultiplied,
       elements: {
-        row: productRow,
+        row: innerDiv,
         quantity: productQuantity,
       },
     };
