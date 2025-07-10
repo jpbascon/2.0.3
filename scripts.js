@@ -97,6 +97,7 @@ function checker() {
   const prevOrderTotal = product.querySelector('.order-total-container');
   const carbonChecker = product.querySelector('.carbon-neutral');
   const confirmOrderBtn = product.querySelector('.confirm-order');
+  const startNewOrderBtn = productsConfirmed.querySelector('start-new-order');
   if (prevOrderTotal) {
     prevOrderTotal.remove();
   }
@@ -106,16 +107,33 @@ function checker() {
   if (confirmOrderBtn) {
     confirmOrderBtn.remove();
   }
+  if (startNewOrderBtn) {
+    startNewOrderBtn.remove();
+  }
 }
 
-function orderConfirm() {
-  checker();
+function orderConfirmStyles() {
   cartCounter.style.display = 'none';
   product.style.display = 'none';
   orderConfirmation.style.display = 'flex';
   cardProducts.forEach((card) => {
     card.style.display = 'none';
   })
+}
+
+function startNewOrderStyles() {
+  cartCounter.style.display = 'block';
+  product.style.display = 'flex';
+  orderConfirmation.style.display = 'none';
+  cardProducts.forEach((card) => {
+    card.style.display = 'block';
+  })
+  cartItems = {};
+}
+
+function orderConfirm() {
+  checker();
+  orderConfirmStyles();
 
   Object.keys(cartItems).forEach(key => {
     const item = cartItems[key];
@@ -128,7 +146,6 @@ function orderConfirm() {
     const productQty = document.createElement('p');
     const productPrice = document.createElement('p');
     const productPriceTotal = document.createElement('p');
-    const orderTotal = document.createElement('p');
 
     orderContainer.classList.add('order-container');
     productDescription.classList.add('order-quantity-price');
@@ -140,7 +157,6 @@ function orderConfirm() {
     productQty.textContent = `${item.quantity}x`;
     productPrice.textContent = `@ $${item.price.toFixed(2)}`;
     productPriceTotal.textContent = `$${(item.quantity * item.price).toFixed(2)}`;
-    orderTotal.textContent = `$${total.toFixed(2)}`;
 
     orderContainer.append(
       productName,
@@ -160,10 +176,26 @@ function orderConfirm() {
 
     productsDescription.append(orderConfirmContainer);
   });
+
+  const orderTotalContainer = document.createElement('div');
   const btnElement = document.createElement('button');
+  const orderTotal = document.createElement('p');
+  const orderString = document.createElement('p');
+  orderTotalContainer.classList.add('order-total-price-container');
+  btnElement.classList.add('start-new-order');
   btnElement.textContent = 'Start New Order';
 
+  orderString.textContent = 'Order Total';
+  orderTotal.textContent = `$${total.toFixed(2)}`;
+
+  orderTotalContainer.append(orderString, orderTotal);
+  productsDescription.append(orderTotalContainer);
   productsConfirmed.append(btnElement);
+
+  btnElement.addEventListener('click', () => {
+    checker();
+    startNewOrderStyles();
+  })
 }
 
 let newValue;
