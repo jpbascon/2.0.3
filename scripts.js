@@ -13,6 +13,7 @@ const orderConfirmation = document.getElementById('order-confirmed');
 const cardProducts = document.querySelectorAll('.card');
 const cartCounter = document.getElementById('cart-counter');
 const productsConfirmed = document.getElementById('products-confirmed');
+const productsDescription = document.getElementById('products-description');
 
 document.addEventListener("DOMContentLoaded", () => {
   getData();
@@ -119,7 +120,9 @@ function orderConfirm() {
   Object.keys(cartItems).forEach(key => {
     const item = cartItems[key];
 
+    const orderContainer = document.createElement('div');
     const orderConfirmContainer = document.createElement('div');
+    const productDescription = document.createElement('div');
     const productImg = document.createElement('img');
     const productName = document.createElement('p');
     const productQty = document.createElement('p');
@@ -127,23 +130,40 @@ function orderConfirm() {
     const productPriceTotal = document.createElement('p');
     const orderTotal = document.createElement('p');
 
+    orderContainer.classList.add('order-container');
+    productDescription.classList.add('order-quantity-price');
+    orderConfirmContainer.classList.add('order-confirm-container');
+    productsDescription.classList.add('product-description');
+
     productImg.src = item.image?.mobile || item.image; // fallback if .mobile doesn't exist
     productName.textContent = item.name;
-    productQty.textContent = `Quantity: ${item.quantity}`;
+    productQty.textContent = `${item.quantity}x`;
     productPrice.textContent = `@ $${item.price.toFixed(2)}`;
     productPriceTotal.textContent = `$${(item.quantity * item.price).toFixed(2)}`;
     orderTotal.textContent = `$${total.toFixed(2)}`;
 
-    orderConfirmContainer.append(
-      productImg,
+    orderContainer.append(
       productName,
+      productDescription
+    );
+
+    productDescription.append(
       productQty,
       productPrice,
       productPriceTotal
     );
 
-    productsConfirmed.append(orderConfirmContainer);
+    orderConfirmContainer.append(
+      productImg,
+      orderContainer
+    );
+
+    productsDescription.append(orderConfirmContainer);
   });
+  const btnElement = document.createElement('button');
+  btnElement.textContent = 'Start New Order';
+
+  productsConfirmed.append(btnElement);
 }
 
 let newValue;
