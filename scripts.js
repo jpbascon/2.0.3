@@ -9,6 +9,10 @@ const productQty = document.getElementById('second-row');
 const emptyCart = document.getElementById('empty-cart');
 const insertImg = document.querySelectorAll('.img-placeholder');
 const insertDescription = document.querySelectorAll('.description');
+const orderConfirmation = document.getElementById('order-confirmed');
+const cardProducts = document.querySelectorAll('.card');
+const cartCounter = document.getElementById('cart-counter');
+const productsConfirmed = document.getElementById('products-confirmed');
 
 document.addEventListener("DOMContentLoaded", () => {
   getData();
@@ -91,12 +95,55 @@ function updateQuantity(idx, delta) {
 function checker() {
   const prevOrderTotal = product.querySelector('.order-total-container');
   const carbonChecker = product.querySelector('.carbon-neutral');
+  const confirmOrderBtn = product.querySelector('.confirm-order');
   if (prevOrderTotal) {
     prevOrderTotal.remove();
   }
   if (carbonChecker) {
     carbonChecker.remove();
   }
+  if (confirmOrderBtn) {
+    confirmOrderBtn.remove();
+  }
+}
+
+function orderConfirm() {
+  checker();
+  cartCounter.style.display = 'none';
+  product.style.display = 'none';
+  orderConfirmation.style.display = 'flex';
+  cardProducts.forEach((card) => {
+    card.style.display = 'none';
+  })
+
+  Object.keys(cartItems).forEach(key => {
+    const item = cartItems[key];
+
+    const orderConfirmContainer = document.createElement('div');
+    const productImg = document.createElement('img');
+    const productName = document.createElement('p');
+    const productQty = document.createElement('p');
+    const productPrice = document.createElement('p');
+    const productPriceTotal = document.createElement('p');
+    const orderTotal = document.createElement('p');
+
+    productImg.src = item.image?.mobile || item.image; // fallback if .mobile doesn't exist
+    productName.textContent = item.name;
+    productQty.textContent = `Quantity: ${item.quantity}`;
+    productPrice.textContent = `@ $${item.price.toFixed(2)}`;
+    productPriceTotal.textContent = `$${(item.quantity * item.price).toFixed(2)}`;
+    orderTotal.textContent = `$${total.toFixed(2)}`;
+
+    orderConfirmContainer.append(
+      productImg,
+      productName,
+      productQty,
+      productPrice,
+      productPriceTotal
+    );
+
+    productsConfirmed.append(orderConfirmContainer);
+  });
 }
 
 let newValue;
@@ -115,8 +162,9 @@ function updateCartQty(delta) {
   }
 }
 
-function updateOrderTotal() {
-  let total = 0;
+let total = 0;
+
+function updateOrderTotal(index) {
   for (const key in cartItems) {
     if (cartItems.hasOwnProperty(key)) {
       total += cartItems[key].quantity * cartItems[key].price;
@@ -131,14 +179,6 @@ function updateOrderTotal() {
   }
 
   // Create and append new order total container
-  const carbonNeutral = document.createElement('div');
-  const carbonInnerText = document.createElement('p');
-  const carbonImg = document.createElement('img');
-  carbonNeutral.classList.add('carbon-neutral');
-  carbonImg.src = './assets/images/icon-carbon-neutral.svg';
-  carbonInnerText.innerHTML = `This is a <span>carbon-neutral</span> delivery`;
-  carbonNeutral.append(carbonImg, carbonInnerText);
-
   const orderTotalContainer = document.createElement('div');
   const order = document.createElement('p');
   const orderTotal = document.createElement('p');
@@ -147,13 +187,29 @@ function updateOrderTotal() {
   orderTotal.textContent = `$${total.toFixed(2)}`;
   orderTotalContainer.append(order, orderTotal);
 
-  product.append(orderTotalContainer, carbonNeutral);
+  const carbonNeutral = document.createElement('div');
+  const carbonInnerText = document.createElement('p');
+  const carbonImg = document.createElement('img');
+  carbonNeutral.classList.add('carbon-neutral');
+  carbonImg.src = './assets/images/icon-carbon-neutral.svg';
+  carbonInnerText.innerHTML = `This is a <span>carbon-neutral</span> delivery`;
+  carbonNeutral.append(carbonImg, carbonInnerText);
+
+  const confirmOrderElement = document.createElement('button');
+  confirmOrderElement.classList.add('confirm-order');
+  confirmOrderElement.textContent = 'Confirm Order';
+
+  confirmOrderElement.addEventListener('click', () => {
+    orderConfirm();
+  })
+
+  product.append(orderTotalContainer, carbonNeutral, confirmOrderElement);
 }
 
 let cartItems = {};
 
 function updateCartProduct(index, delta) {
-  const { name, price } = getProduct[index];
+  const { name, price, image } = getProduct[index];
 
   if (cartItems[index]) {
     cartItems[index].quantity += delta;
@@ -200,6 +256,7 @@ function updateCartProduct(index, delta) {
     product.append(innerDiv);
 
     cartItems[index] = {
+      image,
       name,
       price,
       quantity: 1,
@@ -219,7 +276,7 @@ function updateCartProduct(index, delta) {
     }
   }
 
-  updateOrderTotal();
+  updateOrderTotal(index);
 }
 
 addToCartBtn.forEach((btn, idx) => {
