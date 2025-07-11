@@ -97,7 +97,7 @@ function checker() {
   const prevOrderTotal = product.querySelector('.order-total-container');
   const carbonChecker = product.querySelector('.carbon-neutral');
   const confirmOrderBtn = product.querySelector('.confirm-order');
-  const startNewOrderBtn = productsConfirmed.querySelector('start-new-order');
+  const startNewOrderBtn = productsConfirmed.querySelector('.start-new-order');
   if (prevOrderTotal) {
     prevOrderTotal.remove();
   }
@@ -128,6 +128,13 @@ function startNewOrderStyles() {
   cardProducts.forEach((card) => {
     card.style.display = 'block';
   })
+  Object.keys(cartItems).forEach(key => {
+    if (cartItems[key] && cartItems[key].elements && cartItems[key].elements.row) {
+      cartItems[key].elements.row.remove();
+    }
+  });
+
+  // Clear cartItems object
   cartItems = {};
 }
 
@@ -186,14 +193,13 @@ function orderConfirm() {
   btnElement.textContent = 'Start New Order';
 
   orderString.textContent = 'Order Total';
-  orderTotal.textContent = `$${total.toFixed(2)}`;
+  orderTotal.textContent = `$${orderTotalValue.toFixed(2)}`;
 
   orderTotalContainer.append(orderString, orderTotal);
   productsDescription.append(orderTotalContainer);
   productsConfirmed.append(btnElement);
 
   btnElement.addEventListener('click', () => {
-    checker();
     startNewOrderStyles();
   })
 }
@@ -214,12 +220,14 @@ function updateCartQty(delta) {
   }
 }
 
-let total = 0;
+let orderTotalValue;
 
-function updateOrderTotal(index) {
+function updateOrderTotal() {
+  let total = 0;
   for (const key in cartItems) {
     if (cartItems.hasOwnProperty(key)) {
       total += cartItems[key].quantity * cartItems[key].price;
+      orderTotalValue = total;
     }
   }
 
@@ -328,7 +336,7 @@ function updateCartProduct(index, delta) {
     }
   }
 
-  updateOrderTotal(index);
+  updateOrderTotal();
 }
 
 addToCartBtn.forEach((btn, idx) => {
