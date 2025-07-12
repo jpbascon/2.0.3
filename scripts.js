@@ -44,7 +44,7 @@ let insertedImages = [];
 let getProduct = [];
 
 function appendItem(item, index) {
-  const { thumbnail, mobile, tablet, desktop } = item.image;
+  const { mobile, tablet, desktop } = item.image;
   const { name, category, price } = item;
   getProduct[index] = item;
 
@@ -53,7 +53,26 @@ function appendItem(item, index) {
   const nameElement = document.createElement('p');
   const priceElement = document.createElement('p');
 
-  imgElement.src = mobile;
+  const width = window.innerWidth;
+  if (width <= 480) {
+    imgElement.src = mobile;
+  } else if (width >= 600 && width <= 1024) {
+    imgElement.src = tablet;
+  } else {
+    imgElement.src = desktop;
+  }
+
+  window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    if (width <= 480) {
+      imgElement.src = mobile;
+    } else if (width >= 600 && width <= 1024) {
+      imgElement.src = tablet;
+    } else {
+      imgElement.src = desktop;
+    }
+  });
+
   categoryElement.textContent = category;
   nameElement.textContent = name;
   priceElement.textContent = `$${(price.toFixed(2))}`;
@@ -183,7 +202,7 @@ function orderConfirm() {
     orderConfirmContainer.classList.add('order-confirm-container');
     productsDescription.classList.add('product-description');
 
-    productImg.src = item.image?.mobile || item.image; // fallback if .mobile doesn't exist
+    productImg.src = item.image?.thumbnail || item.image; // fallback if .mobile doesn't exist
     productName.textContent = item.name;
     productQty.textContent = `${item.quantity}x`;
     productPrice.textContent = `@ $${item.price.toFixed(2)}`;

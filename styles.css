@@ -13,6 +13,12 @@
   --Family: 'Red Hat Text', sans-serif;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 h1,
 h2,
 h3,
@@ -33,14 +39,17 @@ body {
 
 .layout {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  width: 100%;
+  position: absolute;
 }
 
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 370px;
   width: 100%;
   gap: 1.5rem;
 }
@@ -157,6 +166,8 @@ body {
 }
 
 .cart-container {
+  display: flex;
+  flex-direction: column;
   margin-top: 1rem;
   width: 100%;
   background-color: white;
@@ -384,4 +395,35 @@ body {
 
 .start-new-order {
   margin-top: 2rem;
+}
+
+@media (width >=37.5rem) {
+  .layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 6rem;
+    width: 100%;
+    gap: 2rem;
+  }
+
+  .outer-container {
+    display: flex;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: .3fr .3fr .3fr;
+    width: unset;
+    align-items: unset;
+  }
+
+  .cart-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 40%;
+    height: fit-content;
+    margin-top: unset;
+  }
 }
