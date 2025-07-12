@@ -14,6 +14,7 @@ const cardProducts = document.querySelectorAll('.card');
 const cartCounter = document.getElementById('cart-counter');
 const productsConfirmed = document.getElementById('products-confirmed');
 const productsDescription = document.getElementById('products-description');
+const titleHeader = document.querySelector('.header');
 
 document.addEventListener("DOMContentLoaded", () => {
   getData();
@@ -116,6 +117,7 @@ function orderConfirmStyles() {
   cartCounter.style.display = 'none';
   product.style.display = 'none';
   orderConfirmation.style.display = 'flex';
+  titleHeader.style.display = 'none';
   cardProducts.forEach((card) => {
     card.style.display = 'none';
   })
@@ -125,18 +127,40 @@ function startNewOrderStyles() {
   cartCounter.style.display = 'block';
   product.style.display = 'flex';
   orderConfirmation.style.display = 'none';
+  titleHeader.style.display = 'block';
   cardProducts.forEach((card) => {
     card.style.display = 'block';
   })
+
   Object.keys(cartItems).forEach(key => {
     if (cartItems[key] && cartItems[key].elements && cartItems[key].elements.row) {
       cartItems[key].elements.row.remove();
     }
   });
 
+  Object.keys(confirmCartItems).forEach((key) => {
+    if (confirmCartItems[key]) {
+      confirmCartItems[key].remove();
+      removeStyles(key);
+      deincrementQty[key].textContent = 0;
+    }
+  })
+
   // Clear cartItems object
   cartItems = {};
+  // Clear confirmCartItems object
+  confirmCartItems = {};
+  // Clear orderTotalContainer DOM
+  if (orderTotalConfirm) {
+    orderTotalConfirm.remove();
+  }
+  // Set cartQty to 0 to reset cart section
+  quantity.textContent = 0;
+  updateCartQty(0);
 }
+
+let confirmCartItems = {};
+let orderTotalConfirm = {};
 
 function orderConfirm() {
   checker();
@@ -181,6 +205,7 @@ function orderConfirm() {
       orderContainer
     );
 
+    confirmCartItems[key] = orderConfirmContainer;
     productsDescription.append(orderConfirmContainer);
   });
 
@@ -195,6 +220,7 @@ function orderConfirm() {
   orderString.textContent = 'Order Total';
   orderTotal.textContent = `$${orderTotalValue.toFixed(2)}`;
 
+  orderTotalConfirm = orderTotalContainer;
   orderTotalContainer.append(orderString, orderTotal);
   productsDescription.append(orderTotalContainer);
   productsConfirmed.append(btnElement);
@@ -205,9 +231,10 @@ function orderConfirm() {
 }
 
 let newValue;
+let quantity;
 
 function updateCartQty(delta) {
-  const quantity = cartQty;
+  quantity = cartQty;
   let value = parseInt(quantity.textContent, 10) || 0;
   newValue = value + delta;
   cartQty.textContent = newValue;
@@ -244,7 +271,7 @@ function updateOrderTotal() {
   const orderTotal = document.createElement('p');
   orderTotalContainer.classList.add('order-total-container');
   order.textContent = 'Order Total';
-  orderTotal.textContent = `$${total.toFixed(2)}`;
+  orderTotal.textContent = `$${orderTotalValue.toFixed(2)}`;
   orderTotalContainer.append(order, orderTotal);
 
   const carbonNeutral = document.createElement('div');
@@ -296,6 +323,7 @@ function updateCartProduct(index, delta) {
       delete cartItems[index];                      // delete item from cart
       updateCartQty(-removedQty);                 // update total quantity
       removeStyles(index);
+      updateOrderTotal();
       deincrementQty[index].textContent = 0;
     })
 
