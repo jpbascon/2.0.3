@@ -15,6 +15,8 @@ const cartCounter = document.getElementById('cart-counter');
 const productsConfirmed = document.getElementById('products-confirmed');
 const productsDescription = document.getElementById('products-description');
 const titleHeader = document.querySelector('.header');
+const cartContainer = document.getElementById('cart-container');
+const dimmedElements = document.getElementById('dim-overlay');
 
 document.addEventListener("DOMContentLoaded", () => {
   getData();
@@ -53,20 +55,19 @@ function appendItem(item, index) {
   const nameElement = document.createElement('p');
   const priceElement = document.createElement('p');
 
-  const width = window.innerWidth;
-  if (width <= 480) {
+
+  if (window.innerWidth <= 480) {
     imgElement.src = mobile;
-  } else if (width >= 600 && width <= 1024) {
+  } else if (window.innerWidth >= 600 && window.innerWidth <= 1024) {
     imgElement.src = tablet;
   } else {
     imgElement.src = desktop;
   }
 
   window.addEventListener('resize', () => {
-    const width = window.innerWidth;
-    if (width <= 480) {
+    if (window.innerWidth <= 480) {
       imgElement.src = mobile;
-    } else if (width >= 600 && width <= 1024) {
+    } else if (window.innerWidth >= 600 && window.innerWidth <= 1024) {
       imgElement.src = tablet;
     } else {
       imgElement.src = desktop;
@@ -133,13 +134,26 @@ function checker() {
 }
 
 function orderConfirmStyles() {
-  cartCounter.style.display = 'none';
-  product.style.display = 'none';
-  orderConfirmation.style.display = 'flex';
-  titleHeader.style.display = 'none';
-  cardProducts.forEach((card) => {
-    card.style.display = 'none';
-  })
+  if (window.innerWidth <= 480) {
+    cartCounter.style.display = 'none';
+    product.style.display = 'none';
+    orderConfirmation.style.display = 'flex';
+    cartContainer.style.display = 'none';
+    dimmedElements.classList.remove('active');
+    cardProducts.forEach((card) => {
+      card.style.display = 'none';
+    })
+  } else {
+    cartCounter.style.display = 'flex';
+    product.style.display = 'flex';
+    orderConfirmation.style.display = 'flex';
+    titleHeader.style.display = 'block';
+    cartContainer.style.display = 'flex';
+    dimmedElements.classList.add('active');
+    cardProducts.forEach((card) => {
+      card.style.display = 'block';
+    })
+  }
 }
 
 function startNewOrderStyles() {
@@ -147,6 +161,8 @@ function startNewOrderStyles() {
   product.style.display = 'flex';
   orderConfirmation.style.display = 'none';
   titleHeader.style.display = 'block';
+  cartContainer.style.display = 'flex';
+  dimmedElements.classList.remove('active');
   cardProducts.forEach((card) => {
     card.style.display = 'block';
   })
@@ -182,7 +198,10 @@ let confirmCartItems = {};
 let orderTotalConfirm = {};
 
 function orderConfirm() {
-  checker();
+  if (window.innerWidth <= 480) {
+    checker();
+  }
+
   orderConfirmStyles();
 
   Object.keys(cartItems).forEach(key => {
